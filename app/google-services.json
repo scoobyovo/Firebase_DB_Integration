@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "561786505255",
+    "project_id": "challenge6-firebase",
+    "storage_bucket": "challenge6-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561786505255:android:6800a4207f83105884e602",
+        "android_client_info": {
+          "package_name": "com.example.challenge6_firebase"
+          
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPoS-1vi-80i6PUzrI45wdxYdjXcuJ0c8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
