@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -66,28 +67,35 @@ fun AddToDo(mod : Modifier, db : Firebase)
 @Composable
 fun ToDoList(mod : Modifier, db : Firebase)
 {
-    val tasks = mutableListOf<TaskModel>()
+    val tasks = remember { mutableStateListOf<TaskModel>() }
     val todoCollection = db.firestore.collection("todo")
 
     todoCollection
         .get()
         .addOnSuccessListener { documents ->
-            documents.map {
-                documentSnapshot ->
+            for (document in documents){
+                documents.map {
+                        documentSnapshot ->
                     val dataMap = documentSnapshot.data
+
                     val task = TaskModel(completed = (dataMap["completed"] as Boolean),
                         dataMap["task"] as String
                     )
                     Log.i("TASK INFO", task.task)
                     tasks.add(task)
+                }
             }
-        }
 
+        }
     LazyColumn {
-        items(tasks) {task->
+        items(tasks){ task->
             Log.i("TaskModel creatred", "COmpleted = ${task.completed}, task = ${task.task}")
             Task(task)
         }
     }
+
+
 }
+
+
 
