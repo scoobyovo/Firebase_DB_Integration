@@ -12,6 +12,7 @@ import com.google.firebase.firestore.model.Document
 fun Task(task: TaskModel) : Unit
 {
 
+
     Row(){
         Checkbox(checked = task.completed,
             onCheckedChange = {})
