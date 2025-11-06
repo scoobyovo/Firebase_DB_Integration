@@ -9,10 +9,14 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.model.Document
 
 @Composable
-fun Task(document: String) : Unit
+fun Task(task: TaskModel) : Unit
 {
+
     Row(){
-        Text(document)
+        Checkbox(checked = task.completed,
+            onCheckedChange = {})
+        Text(task.task)
+
 
     }
 }

@@ -10,16 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.challenge6_firebase.ui.theme.Challenge6_FirebaseTheme
@@ -61,6 +58,7 @@ fun AddToDo(mod : Modifier, db : Firebase)
             onClick = { AddTask(db.firestore, task_input.value) }
         ) {
             Text("Add task")
+            //Log.i("TASK ADDED", "task = ${task_input.value}")
         }
     }
 }
@@ -68,19 +66,28 @@ fun AddToDo(mod : Modifier, db : Firebase)
 @Composable
 fun ToDoList(mod : Modifier, db : Firebase)
 {
-    var tasks by remember { mutableStateOf(listOf<String>()) }
+    val tasks = mutableListOf<TaskModel>()
+    val todoCollection = db.firestore.collection("todo")
 
-    db.firestore.collection("users")
+    todoCollection
         .get()
-        .addOnSuccessListener { result->
-            val newTasks = result.map {it.id}
-            tasks = newTasks
+        .addOnSuccessListener { documents ->
+            documents.map {
+                documentSnapshot ->
+                    val dataMap = documentSnapshot.data
+                    val task = TaskModel(completed = (dataMap["completed"] as Boolean),
+                        dataMap["task"] as String
+                    )
+                    Log.i("TASK INFO", task.task)
+                    tasks.add(task)
+            }
         }
 
     LazyColumn {
         items(tasks) {task->
-            Log.i("TASK DB", task)
+            Log.i("TaskModel creatred", "COmpleted = ${task.completed}, task = ${task.task}")
             Task(task)
         }
     }
 }
+
