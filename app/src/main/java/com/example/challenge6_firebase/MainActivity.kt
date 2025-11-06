@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,8 +34,11 @@ class MainActivity : ComponentActivity() {
             Challenge6_FirebaseTheme {
                 val db = Firebase.firestore
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AddToDo(mod = Modifier, db = Firebase)
-                    ToDoList(mod = Modifier, db = Firebase)
+                    Column {
+                        AddToDo(mod = Modifier.padding(innerPadding), db = Firebase)
+                        ToDoList(mod = Modifier.padding(innerPadding), db = Firebase)
+                    }
+
                 }
             }
         }
@@ -65,37 +69,33 @@ fun AddToDo(mod : Modifier, db : Firebase)
 }
 
 @Composable
-fun ToDoList(mod : Modifier, db : Firebase)
-{
+fun ToDoList(mod: Modifier, db: Firebase) {
     val tasks = remember { mutableStateListOf<TaskModel>() }
     val todoCollection = db.firestore.collection("todo")
 
-    todoCollection
-        .get()
-        .addOnSuccessListener { documents ->
-            for (document in documents){
-                documents.map {
-                        documentSnapshot ->
-                    val dataMap = documentSnapshot.data
-
-                    val task = TaskModel(completed = (dataMap["completed"] as Boolean),
-                        dataMap["task"] as String
+    // Run once when the composable first appears instead of for each time the data
+    // changes in composable.
+    LaunchedEffect(Unit) {
+        todoCollection.get()
+            .addOnSuccessListener { documents ->
+                tasks.clear()
+                for (document in documents) {
+                    val dataMap = document.data
+                    val task = TaskModel(
+                        completed = dataMap["completed"] as Boolean,
+                        task = dataMap["task"] as String
                     )
-                    Log.i("TASK INFO", task.task)
                     tasks.add(task)
                 }
             }
+            .addOnFailureListener {
+                Log.e("Firestore", "Failed to load tasks: ", it)
+            }
+    }
 
-        }
-    LazyColumn {
-        items(tasks){ task->
-            Log.i("TaskModel creatred", "COmpleted = ${task.completed}, task = ${task.task}")
+    LazyColumn(modifier = mod) {
+        items(tasks) { task ->
             Task(task)
         }
     }
-
-
 }
-
-
-
